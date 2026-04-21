@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz ADN · Question</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B1120;--surface:#111827;--surface2:#1F2937;--surface3:#263040;
+  --border:#374151;--text:#F9FAFB;--muted:#9CA3AF;
+  --green:#10B981;--green-bg:rgba(16,185,129,.1);
+  --red:#EF4444;--red-bg:rgba(239,68,68,.1);
+  --yellow:#F59E0B;--yellow-bg:rgba(245,158,11,.1);
+  --blue:#3B82F6;--blue-dark:#1D4ED8;--blue-bg:rgba(59,130,246,.08);
+  --radius:14px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+mono{font-family:'JetBrains Mono',monospace}
+
+/* LAYOUT */
+.wrap{max-width:720px;margin:0 auto;padding:1rem 1rem 5rem}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo{font-size:22px}
+.niveau-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+.badge-facile{background:rgba(16,185,129,.15);color:#10B981}
+.badge-moyen{background:rgba(245,158,11,.15);color:#F59E0B}
+.badge-difficile{background:rgba(239,68,68,.15);color:#EF4444}
+
+.topbar-right{display:flex;align-items:center;gap:10px}
+.score-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600}
+.btn-terminer{font-size:12px;font-weight:500;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;text-decoration:none}
+.btn-terminer:hover{border-color:var(--red);color:var(--red)}
+
+/* TIMER */
+.timer-wrap{margin-bottom:1.25rem}
+.timer-bar-bg{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.timer-bar{height:100%;border-radius:3px;transition:width 1s linear,background .5s;background:var(--green)}
+.timer-bar.warn{background:var(--yellow)}
+.timer-bar.danger{background:var(--red)}
+.timer-info{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.timer-count{font-weight:700;font-size:14px;color:var(--text)}
+.timer-count.danger{color:var(--red)}
+
+/* QUESTION CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem}
+.card-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.q-num{background:var(--blue-bg);border:1px solid rgba(59,130,246,.2);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--blue);font-weight:600}
+
+.adn-sequence{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:1rem 1.25rem;font-family:'JetBrains Mono',monospace;
+  font-size:18px;font-weight:600;letter-spacing:3px;color:#60A5FA;
+  word-break:break-all;line-height:1.8;margin-bottom:.5rem;
+}
+.adn-hint{font-size:12px;color:var(--muted);display:flex;gap:1.5rem;flex-wrap:wrap}
+.adn-hint span{display:flex;align-items:center;gap:4px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-start{background:#34D399}
+.dot-stop{background:#F87171}
+
+/* FORM */
+.field{margin-bottom:1rem}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px}
+.field-label span{color:var(--text);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px}
+input.answer-input{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:10px;padding:11px 14px;font-family:'JetBrains Mono',monospace;
+  font-size:14px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s;
+  letter-spacing:1px;
+}
+input.answer-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+input.answer-input::placeholder{font-family:'Inter',sans-serif;letter-spacing:0;color:var(--muted)}
+input.answer-input.correct{border-color:var(--green);background:var(--green-bg)}
+input.answer-input.wrong{border-color:var(--red);background:var(--red-bg)}
+
+.btn-valider{
+  width:100%;background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+  color:white;border:none;border-radius:10px;padding:13px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(59,130,246,.25);
+}
+.btn-valider:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.35)}
+
+/* CORRECTION */
+.correction{border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.correction.all-good{background:var(--green-bg);border:1px solid rgba(16,185,129,.3)}
+.correction.partial{background:var(--yellow-bg);border:1px solid rgba(245,158,11,.3)}
+.correction.wrong{background:var(--red-bg);border:1px solid rgba(239,68,68,.3)}
+
+.correction-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.correction-title{font-size:15px;font-weight:700}
+.pts-badge{font-size:14px;font-weight:800;padding:4px 14px;border-radius:20px}
+.pts-ok{background:rgba(16,185,129,.2);color:var(--green)}
+.pts-partial{background:rgba(245,158,11,.2);color:var(--yellow)}
+.pts-ko{background:rgba(239,68,68,.2);color:var(--red)}
+
+.corr-row{margin-bottom:.75rem}
+.corr-row-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.check{font-size:14px}
+.corr-val{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(0,0,0,.2);border-radius:8px;padding:8px 12px;letter-spacing:1px;word-break:break-all}
+
+/* EXPLICATIONS */
+.expl-block{margin-top:.75rem}
+.expl-title{font-size:12px;font-weight:600;color:var(--yellow);margin-bottom:.5rem;display:flex;align-items:center;gap:6px}
+.expl-item{font-size:12px;color:var(--muted);padding:5px 0 5px 14px;border-left:2px solid var(--yellow);margin-bottom:4px;line-height:1.5}
+
+/* DETAIL CODONS */
+.codons-detail{margin-top:1rem}
+.codons-detail-title{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:.5rem}
+.codons-list{display:flex;flex-wrap:wrap;gap:6px}
+.codon-chip{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:5px 10px;text-align:center;
+}
+.codon-chip .codon{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--blue)}
+.codon-chip .aa{font-size:11px;color:var(--green);font-weight:600}
+.codon-chip .aa-nom{font-size:10px;color:var(--muted)}
+.codon-chip.stop .codon{color:var(--red)}
+.codon-chip.stop .aa{color:var(--red)}
+
+.btn-suivant{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);
+  color:var(--text);border-radius:10px;padding:13px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .2s;margin-top:.5rem;
+}
+.btn-suivant:hover{border-color:var(--blue);background:var(--blue-bg)}
+
+/* TABLE DES CODONS */
+.table-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px 16px;cursor:pointer;margin-bottom:.5rem;
+  font-size:13px;font-weight:600;transition:all .2s;
+}
+.table-toggle:hover{border-color:var(--blue)}
+.table-toggle .arrow{transition:transform .3s;font-size:12px}
+.table-toggle.open .arrow{transform:rotate(180deg)}
+
+.codons-table-wrap{display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1rem;overflow-x:auto}
+.codons-table-wrap.show{display:block}
+
+.codons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:5px}
+.ct-cell{background:var(--surface2);border-radius:7px;padding:6px 8px;text-align:center}
+.ct-codon{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--blue)}
+.ct-aa{font-size:11px;color:var(--muted);margin-top:2px}
+.ct-cell.ct-stop .ct-codon{color:var(--red)}
+.ct-cell.ct-stop .ct-aa{color:var(--red)}
+.ct-cell.ct-met .ct-codon{color:var(--green)}
+.ct-cell.ct-met .ct-aa{color:var(--green)}
+
+@media(max-width:480px){
+  .wrap{padding:.75rem .75rem 4rem}
+  .adn-sequence{font-size:15px;letter-spacing:2px}
+  .topbar{gap:.5rem}
+  .card{padding:1rem}
+  .correction{padding:1rem}
+  .codons-grid{grid-template-columns:repeat(auto-fill,minmax(70px,1fr))}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="logo">🧬</span>
+      <span class="niveau-badge badge-{{niveau}}">{{cfg.emoji}} {{cfg.label}}</span>
+    </div>
+    <div class="topbar-right">
+      <span class="score-pill">⭐ {{score}} / {{total}} pts</span>
+      <a href="/reset" class="btn-terminer">Quitter</a>
+    </div>
+  </div>
+
+  <!-- TIMER (seulement si pas de correction affichée) -->
+  {% if not correction %}
+  <div class="timer-wrap">
+    <div class="timer-bar-bg">
+      <div class="timer-bar" id="timer-bar" style="width:100%"></div>
+    </div>
+    <div class="timer-info">
+      <span>⏱ Temps restant</span>
+      <span class="timer-count" id="timer-count">{{cfg.timer}}s</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- CORRECTION (si réponse soumise) -->
+  {% if correction %}
+  {% set cls = 'all-good' if correction.arn_ok and correction.prot_ok else ('partial' if correction.pts > 0 else 'wrong') %}
+  <div class="correction {{cls}}">
+    <div class="correction-header">
+      <span class="correction-title">
+        {% if correction.arn_ok and correction.prot_ok %}✅ Parfait !
+        {% elif correction.pts > 0 %}⚠️ Partiellement correct
+        {% else %}❌ À corriger
+        {% endif %}
+      </span>
+      <span class="pts-badge {% if correction.pts == correction.pts_max %}pts-ok{% elif correction.pts > 0 %}pts-partial{% else %}pts-ko{% endif %}">
+        +{{correction.pts}} / {{correction.pts_max}} pts
+      </span>
+    </div>
+
+    <!-- ARN -->
+    <div class="corr-row">
+      <div class="corr-row-label">
+        <span class="check">{% if correction.arn_ok %}✅{% else %}❌{% endif %}</span>
+        ARNm attendu
+      </div>
+      <div class="corr-val" style="color:{% if correction.arn_ok %}var(--green){% else %}var(--red){% endif %}">
+        {{correction.arn}}
+      </div>
+      {% if not correction.arn_ok and correction.arn_saisi %}
+      <div class="corr-val" style="color:var(--muted);margin-top:4px;font-size:12px">Ta réponse : {{correction.arn_saisi}}</div>
+      {% endif %}
+    </div>
+
+    {% if not correction.arn_ok and correction.expl_arn %}
+    <div class="expl-block">
+      <div class="expl-title">💡 Explication</div>
+      {% for e in correction.expl_arn %}
+      <div class="expl-item">{{e}}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Protéine -->
+    <div class="corr-row" style="margin-top:.75rem">
+      <div class="corr-row-label">
+        <span class="check">{% if correction.prot_ok %}✅{% else %}❌{% endif %}</span>
+        Protéine attendue
+      </div>
+      <div class="corr-val" style="color:{% if correction.prot_ok %}var(--green){% else %}var(--red){% endif %}">
+        {{correction.prot}}
+      </div>
+      {% if not correction.prot_ok and correction.prot_saisie %}
+      <div class="corr-val" style="color:var(--muted);margin-top:4px;font-size:12px">Ta réponse : {{correction.prot_saisie}}</div>
+      {% endif %}
+    </div>
+
+    {% if not correction.prot_ok and correction.expl_prot %}
+    <div class="expl-block">
+      <div class="expl-title">💡 Explication</div>
+      {% for e in correction.expl_prot %}
+      <div class="expl-item">{{e}}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Détail codons -->
+    <div class="codons-detail">
+      <div class="codons-detail-title">📖 Décodage codon par codon :</div>
+      <div class="codons-list">
+        {% for d in correction.detail_codons %}
+        <div class="codon-chip {% if d.aa == 'STOP' %}stop{% endif %}">
+          <div class="codon">{{d.codon}}</div>
+          <div class="aa">{{d.aa}}</div>
+          <div class="aa-nom">{{d.nom}}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUTONS APRÈS CORRECTION -->
+  <form method="POST">
+    <button type="submit" class="btn-suivant">➡️ Question suivante</button>
+  </form>
+  <form method="POST" action="/terminer">
+    <button type="submit" class="btn-valider" style="margin-top:.5rem;background:linear-gradient(135deg,#065F46,#10B981)">
+      🏁 Terminer et voir mon score
+    </button>
+  </form>
+
+  {% else %}
+
+  <!-- QUESTION -->
+  <div class="card">
+    <div class="card-label">
+      🔬 Séquence ADN à analyser
+      <span class="q-num">Question {{question_num + 1}}</span>
+    </div>
+    <div class="adn-sequence">{{adn}}</div>
+    <div class="adn-hint">
+      <span><span class="dot dot-start"></span> ATG = codon START</span>
+      <span><span class="dot dot-stop"></span> TAA/TAG/TGA = codon STOP</span>
+    </div>
+  </div>
+
+  <form method="POST" id="quiz-form">
+    <div class="card">
+      <div class="field">
+        <label class="field-label" for="arn">
+          ARNm correspondant
+          <span> · Remplace chaque T par U</span>
+        </label>
+        <input type="text" name="arn" id="arn" class="answer-input" placeholder="Ex : AUGCUUGAA…" autocomplete="off" autocorrect="off" spellcheck="false" required>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="prot">
+          Séquence protéique <span> · Sépare par des tirets</span>
+        </label>
+        <input type="text" name="prot" id="prot" class="answer-input" placeholder="Ex : Met-Leu-Glu" autocomplete="off" autocorrect="off" spellcheck="false" required>
+      </div>
+
+      <button type="submit" class="btn-valider" id="btn-valider">✅ Valider mes réponses</button>
+    </div>
+  </form>
+
+  {% endif %}
+
+  <!-- TABLE DES CODONS -->
+  <div class="table-toggle" id="table-toggle" onclick="toggleTable()">
+    <span>📋 Table des codons</span>
+    <span class="arrow" id="table-arrow">▼</span>
+  </div>
+  <div class="codons-table-wrap" id="codons-table">
+    <div class="codons-grid">
+      {% for codon, aa in codons.items() %}
+      <div class="ct-cell {% if aa == 'STOP' %}ct-stop{% elif codon == 'AUG' %}ct-met{% endif %}">
+        <div class="ct-codon">{{codon}}</div>
+        <div class="ct-aa">{{aa}}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+{% if not correction %}
+// ─── TIMER ────────────────────────────────────────────────────────────────
+const TOTAL_SEC = {{ cfg.timer }};
+let remaining = TOTAL_SEC;
+const bar = document.getElementById('timer-bar');
+const count = document.getElementById('timer-count');
+
+function tick() {
+  remaining--;
+  const pct = (remaining / TOTAL_SEC) * 100;
+  bar.style.width = pct + '%';
+  count.textContent = remaining + 's';
+
+  if (remaining <= 10) {
+    bar.classList.add('danger');
+    bar.classList.remove('warn');
+    count.classList.add('danger');
+  } else if (remaining <= TOTAL_SEC * 0.4) {
+    bar.classList.add('warn');
+  }
+
+  if (remaining <= 0) {
+    clearInterval(timer);
+    count.textContent = '⏰ Temps écoulé !';
+    document.getElementById('quiz-form').submit();
+  }
+}
+
+const timer = setInterval(tick, 1000);
+
+document.getElementById('quiz-form').addEventListener('submit', function() {
+  clearInterval(timer);
+});
+{% endif %}
+
+// ─── TABLE DES CODONS ─────────────────────────────────────────────────────
+function toggleTable() {
+  const wrap = document.getElementById('codons-table');
+  const toggle = document.getElementById('table-toggle');
+  const arrow = document.getElementById('table-arrow');
+  wrap.classList.toggle('show');
+  toggle.classList.toggle('open');
+}
+
+// ─── AUTO-FORMAT INPUTS ───────────────────────────────────────────────────
+const arnInput = document.getElementById('arn');
+const protInput = document.getElementById('prot');
+
+if (arnInput) {
+  arnInput.addEventListener('input', function() {
+    this.value = this.value.toUpperCase().replace(/[^AUGC]/g, '');
+  });
+}
+
+if (protInput) {
+  protInput.addEventListener('input', function() {
+    // Auto-capitalise first letter of each segment
+    let val = this.value;
+    // Allow letters and hyphens only
+    val = val.replace(/[^a-zA-Z\-]/g, '');
+    this.value = val;
+  });
+}
+</script>
+</body>
+</html>
