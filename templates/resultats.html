@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz ADN · Résultats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B1120;--surface:#111827;--surface2:#1F2937;
+  --border:#374151;--text:#F9FAFB;--muted:#9CA3AF;
+  --green:#10B981;--yellow:#F59E0B;--red:#EF4444;
+  --blue:#3B82F6;--blue-dark:#1D4ED8;
+  --radius:14px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:540px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* RESULT HERO */
+.result-hero{text-align:center;padding:2rem 1rem;margin-bottom:1.5rem}
+.result-icon{font-size:64px;margin-bottom:1rem;display:block;animation:bounceIn .6s ease-out}
+@keyframes bounceIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.result-hero h1{font-size:26px;font-weight:800;margin-bottom:.5rem}
+.result-hero .pseudo{font-size:16px;color:var(--muted);margin-bottom:1.5rem}
+
+/* SCORE CIRCLE */
+.score-ring{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:140px;height:140px;border-radius:50%;border:4px solid;margin-bottom:1.5rem;position:relative}
+.score-ring.excellent{border-color:var(--green);box-shadow:0 0 40px rgba(16,185,129,.3)}
+.score-ring.good{border-color:var(--yellow);box-shadow:0 0 40px rgba(245,158,11,.3)}
+.score-ring.low{border-color:var(--red);box-shadow:0 0 40px rgba(239,68,68,.3)}
+.score-pct{font-size:34px;font-weight:800;line-height:1}
+.score-frac{font-size:13px;color:var(--muted);margin-top:4px}
+
+.result-msg{font-size:14px;color:var(--muted);max-width:300px;margin:0 auto 1.5rem}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.5rem}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center}
+.stat-val{font-size:22px;font-weight:800;margin-bottom:3px}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* BUTTONS */
+.btn-primary{
+  display:block;width:100%;text-align:center;text-decoration:none;
+  background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+  color:white;border:none;border-radius:12px;padding:14px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(59,130,246,.25);
+  margin-bottom:.75rem;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.35)}
+.btn-secondary{
+  display:block;width:100%;text-align:center;text-decoration:none;
+  background:transparent;border:1.5px solid var(--border);border-radius:12px;padding:12px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
+  color:var(--muted);cursor:pointer;transition:all .2s;margin-bottom:.75rem;
+}
+.btn-secondary:hover{border-color:var(--blue);color:var(--text)}
+
+/* CLASSEMENT */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.card h2{font-size:15px;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+
+.classement-list{display:flex;flex-direction:column;gap:6px}
+.rank-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface2);border-radius:10px;padding:10px 14px;
+  transition:all .15s;
+}
+.rank-item.me{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)}
+.rank-num{font-size:13px;font-weight:700;color:var(--muted);width:24px;text-align:center;flex-shrink:0}
+.rank-num.gold{color:#F59E0B;font-size:18px}
+.rank-num.silver{color:#94A3B8;font-size:16px}
+.rank-num.bronze{color:#B45309;font-size:15px}
+.rank-pseudo{font-size:13px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-info{text-align:right;flex-shrink:0}
+.rank-pct{font-size:14px;font-weight:700}
+.rank-pct.high{color:var(--green)}
+.rank-pct.mid{color:var(--yellow)}
+.rank-pct.low{color:var(--red)}
+.rank-detail{font-size:11px;color:var(--muted)}
+.rank-niveau{font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;margin-left:6px}
+.badge-facile{background:rgba(16,185,129,.15);color:#10B981}
+.badge-moyen{background:rgba(245,158,11,.15);color:#F59E0B}
+.badge-difficile{background:rgba(239,68,68,.15);color:#EF4444}
+
+.empty-rank{text-align:center;padding:2rem;color:var(--muted);font-size:13px}
+
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .result-icon{font-size:52px}
+  .score-ring{width:120px;height:120px}
+  .score-pct{font-size:28px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- RÉSULTAT PERSONNEL -->
+  {% set pct = ((score / total * 100) | round | int) if total > 0 else 0 %}
+  {% set ring_cls = 'excellent' if pct >= 70 else ('good' if pct >= 40 else 'low') %}
+
+  <div class="result-hero">
+    <span class="result-icon">
+      {% if pct >= 80 %}🏆{% elif pct >= 60 %}🎉{% elif pct >= 40 %}💪{% else %}📚{% endif %}
+    </span>
+    <h1>
+      {% if pct >= 80 %}Excellent !{% elif pct >= 60 %}Bien joué !{% elif pct >= 40 %}Continue !{% else %}À retravailler{% endif %}
+    </h1>
+    <div class="pseudo">{{pseudo}} · Niveau {{niveaux[niveau].emoji}} {{niveaux[niveau].label}}</div>
+
+    <div class="score-ring {{ring_cls}}">
+      <span class="score-pct" style="color:{% if pct >= 70 %}#10B981{% elif pct >= 40 %}#F59E0B{% else %}#EF4444{% endif %}">{{pct}}%</span>
+      <span class="score-frac">{{score}} / {{total}} pts</span>
+    </div>
+
+    <div class="result-msg">
+      {% if pct >= 80 %}Tu maîtrises parfaitement la transcription et la traduction ! Bravo 🌟
+      {% elif pct >= 60 %}Bonne compréhension ! Revois quelques codons pour atteindre le top.
+      {% elif pct >= 40 %}Tu es sur la bonne voie. Utilise la table des codons pour t'entraîner.
+      {% else %}Pas de souci, ça s'apprend ! Relis ton cours sur la transcription puis réessaie.{% endif %}
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val" style="color:var(--blue)">{{question_num}}</div>
+        <div class="stat-label">Questions</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:var(--green)">{{score}}</div>
+        <div class="stat-label">Points</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:{% if pct >= 70 %}var(--green){% elif pct >= 40 %}var(--yellow){% else %}var(--red){% endif %}">{{pct}}%</div>
+        <div class="stat-label">Réussite</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <a href="/demarrer" class="btn-primary" onclick="this.href='#'" style="display:none"></a>
+  <form method="POST" action="/demarrer">
+    <input type="hidden" name="niveau" value="{{niveau}}">
+    <input type="hidden" name="pseudo" value="{{pseudo}}">
+    <button type="submit" class="btn-primary">🔄 Rejouer (même niveau)</button>
+  </form>
+  <a href="/" class="btn-secondary">🏠 Changer de niveau</a>
+
+  <!-- CLASSEMENT -->
+  <div class="card">
+    <h2>🏆 Classement général</h2>
+    {% if classement %}
+    <div class="classement-list">
+      {% for entry in classement %}
+      {% set is_me = (entry.pseudo == pseudo and loop.index == 1) or loop.index <= 20 %}
+      <div class="rank-item {% if entry.pseudo == pseudo %}me{% endif %}">
+        <span class="rank-num {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% elif loop.index == 3 %}bronze{% endif %}">
+          {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{loop.index}}{% endif %}
+        </span>
+        <span class="rank-pseudo">
+          {{entry.pseudo}}
+          <span class="rank-niveau badge-{{entry.niveau}}">{{entry.niveau}}</span>
+        </span>
+        <div class="rank-info">
+          <div class="rank-pct {% if entry.pct >= 70 %}high{% elif entry.pct >= 40 %}mid{% else %}low{% endif %}">
+            {{entry.pct}}%
+          </div>
+          <div class="rank-detail">{{entry.score}}/{{entry.total}} · {{entry.date}}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-rank">
+      Aucune entrée encore. Sois le premier ! 🚀
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>
