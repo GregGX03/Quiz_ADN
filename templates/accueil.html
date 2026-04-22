@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz ADN · Accueil</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B1120;--surface:#111827;--surface2:#1F2937;
+  --border:#374151;--text:#F9FAFB;--muted:#9CA3AF;
+  --green:#10B981;--yellow:#F59E0B;--red:#EF4444;
+  --blue:#3B82F6;--blue-dark:#1D4ED8;--radius:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── FOND ANIMÉ ── */
+.bg-anim{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.dna-strand{position:absolute;opacity:.04;font-size:13px;color:#3B82F6;white-space:nowrap;letter-spacing:2px;animation:scrollDown 20s linear infinite}
+.dna-strand:nth-child(2){left:20%;animation-delay:-5s;animation-duration:25s}
+.dna-strand:nth-child(3){left:50%;animation-delay:-10s;animation-duration:18s}
+.dna-strand:nth-child(4){left:75%;animation-delay:-15s;animation-duration:22s}
+@keyframes scrollDown{from{transform:translateY(-100%)}to{transform:translateY(100vh)}}
+
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:2rem 1rem 3rem;flex:1;display:flex;flex-direction:column;justify-content:center}
+
+/* ── HERO ── */
+.hero{text-align:center;margin-bottom:2rem}
+.hero-icon{font-size:52px;margin-bottom:.75rem;display:block;animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.hero h1{font-size:30px;font-weight:800;background:linear-gradient(135deg,#60A5FA,#34D399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.4rem}
+.hero p{color:var(--muted);font-size:13px;line-height:1.6}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:.875rem}
+.card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
+
+/* ── INPUT PSEUDO ── */
+.input-wrap{position:relative}
+.input-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+input[type=text]{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:10px;padding:11px 14px 11px 38px;
+  font-family:'Inter',sans-serif;font-size:14px;color:var(--text);
+  outline:none;transition:border-color .15s;
+}
+input[type=text]:focus{border-color:var(--blue)}
+input[type=text]::placeholder{color:var(--muted)}
+
+/* ── NIVEAUX ── */
+.levels{display:flex;flex-direction:column;gap:8px;margin-bottom:0}
+.level-opt{display:none}
+.level-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface2);border:2px solid var(--border);
+  border-radius:11px;padding:12px 14px;cursor:pointer;
+  transition:all .18s;
+}
+.level-card:hover{border-color:var(--blue);background:#1a2235}
+.level-opt:checked+.level-card{border-color:var(--blue);background:rgba(59,130,246,.08)}
+.level-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.dot-facile{background:var(--green)}.dot-moyen{background:var(--yellow)}.dot-difficile{background:var(--red)}
+.level-info{flex:1;min-width:0}
+.level-name{font-size:13px;font-weight:600}
+.level-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.level-pts{font-size:12px;font-weight:700;color:var(--blue);white-space:nowrap;flex-shrink:0}
+
+/* ── NB QUESTIONS ── */
+.qmode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.qmode-opt{display:none}
+.qmode-card{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--surface2);border:2px solid var(--border);
+  border-radius:10px;padding:10px 4px;cursor:pointer;
+  transition:all .18s;text-align:center;
+}
+.qmode-card:hover{border-color:var(--blue)}
+.qmode-opt:checked+.qmode-card{border-color:var(--blue);background:rgba(59,130,246,.08)}
+.qmode-val{font-size:18px;font-weight:800;color:var(--text);line-height:1}
+.qmode-sub{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* ── MODE EXAMEN TOGGLE ── */
+.exam-toggle{
+  display:flex;align-items:center;gap:14px;cursor:pointer;
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:11px;padding:12px 14px;transition:border-color .18s;
+}
+.exam-toggle:hover{border-color:var(--blue)}
+.exam-toggle input[type=checkbox]{display:none}
+.toggle-track{
+  width:42px;height:24px;background:var(--border);border-radius:12px;
+  flex-shrink:0;position:relative;transition:background .2s;
+}
+.exam-toggle input:checked~.toggle-track{background:var(--blue)}
+.toggle-thumb{
+  position:absolute;top:3px;left:3px;width:18px;height:18px;
+  background:white;border-radius:50%;transition:transform .2s;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.exam-toggle input:checked~.toggle-track .toggle-thumb{transform:translateX(18px)}
+.toggle-label{font-size:13px;font-weight:600}
+.toggle-desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── BOUTONS ── */
+.btn-start{
+  width:100%;background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+  color:white;border:none;border-radius:11px;padding:14px;
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(59,130,246,.3);
+  margin-top:.875rem;
+}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(59,130,246,.4)}
+.btn-start:active{transform:none}
+.btn-classement{
+  display:block;text-align:center;background:transparent;
+  border:1.5px solid var(--border);border-radius:11px;padding:11px;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  color:var(--muted);cursor:pointer;text-decoration:none;
+  transition:all .2s;margin-top:.75rem;
+}
+.btn-classement:hover{border-color:var(--blue);color:var(--text)}
+.footer{text-align:center;padding:1.25rem 1rem .5rem;font-size:11px;color:var(--muted)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:400px){
+  .hero h1{font-size:25px}
+  .hero-icon{font-size:42px}
+  .card{padding:1.125rem}
+  .qmode-grid{grid-template-columns:repeat(2,1fr)}
+  .qmode-val{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-anim">
+  <div class="dna-strand">A-T-G-C-T-A-G-C-A-T-G-C-T-A-G-C-A-T-G-C-A-T-G-C-T-A</div>
+  <div class="dna-strand">C-G-A-T-T-A-C-G-A-T-T-A-C-G-A-T-C-G-A-T-T-A-C-G-A-T</div>
+  <div class="dna-strand">G-C-T-A-G-C-T-A-G-C-G-C-T-A-G-C-T-A-G-C-T-A-G-C-T-A</div>
+  <div class="dna-strand">T-A-C-G-T-A-C-G-T-A-C-G-T-A-C-G-T-A-C-G-T-A-C-G-T-A</div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <span class="hero-icon">🧬</span>
+    <h1>Quiz ADN</h1>
+    <p>Maîtrise la transcription et la traduction génétique.<br>Terminale SVT · Codons · Acides aminés</p>
+  </div>
+
+  <form method="POST" action="/demarrer">
+
+    <!-- PSEUDO -->
+    <div class="card">
+      <div class="card-title">Ton prénom / pseudo</div>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input type="text" name="pseudo" placeholder="Ex : Marie, Kofi, Alex…" maxlength="20" required autocomplete="off">
+      </div>
+    </div>
+
+    <!-- NIVEAU -->
+    <div class="card">
+      <div class="card-title">Niveau de difficulté</div>
+      <div class="levels">
+        {% for key, n in niveaux.items() %}
+        <input type="radio" name="niveau" id="lvl-{{key}}" value="{{key}}" class="level-opt" {% if key=='facile' %}checked{% endif %}>
+        <label for="lvl-{{key}}" class="level-card">
+          <span class="level-dot dot-{{key}}"></span>
+          <div class="level-info">
+            <div class="level-name">{{n.emoji}} {{n.label}}</div>
+            <div class="level-desc">{{n.description}}</div>
+          </div>
+          <span class="level-pts">+{{n.points_arn + n.points_prot}} pts/Q</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- NOMBRE DE QUESTIONS -->
+    <div class="card">
+      <div class="card-title">Nombre de questions</div>
+      <div class="qmode-grid">
+        {% for mode in question_modes %}
+        <input type="radio" name="question_max" id="qm-{{mode.value}}" value="{{mode.value}}" class="qmode-opt"
+               {% if mode.value == 10 %}checked{% endif %}>
+        <label for="qm-{{mode.value}}" class="qmode-card">
+          <span class="qmode-val">{{mode.label}}</span>
+          <span class="qmode-sub">{{mode.sublabel}}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- MODE EXAMEN -->
+    <div class="card">
+      <div class="card-title">Options</div>
+      <label class="exam-toggle">
+        <input type="checkbox" name="mode_examen" id="mode_examen">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <div>
+          <div class="toggle-label">🎓 Mode examen</div>
+          <div class="toggle-desc">Masque la table des codons pendant le quiz</div>
+        </div>
+      </label>
+    </div>
+
+    <button type="submit" class="btn-start">🚀 Commencer le quiz</button>
+
+  </form>
+
+  <a href="/resultats" class="btn-classement">🏆 Voir le classement général</a>
+
+  <div class="footer">Quiz de SVT · Terminale · Transcription &amp; Traduction</div>
+
+</div>
+
+<script>
+// Synchronise le toggle thumb avec l'état de la checkbox
+const cb = document.getElementById('mode_examen');
+const track = cb.nextElementSibling;
+cb.addEventListener('change', () => {
+  track.querySelector('.toggle-thumb').style.transform =
+    cb.checked ? 'translateX(18px)' : 'translateX(0)';
+  track.style.background = cb.checked ? 'var(--blue)' : 'var(--border)';
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz ADN · Résultats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B1120;--surface:#111827;--surface2:#1F2937;
+  --border:#374151;--text:#F9FAFB;--muted:#9CA3AF;
+  --green:#10B981;--yellow:#F59E0B;--red:#EF4444;
+  --blue:#3B82F6;--blue-dark:#1D4ED8;--radius:14px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:560px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* ── HERO RÉSULTAT ── */
+.result-hero{text-align:center;padding:1.75rem 1rem;margin-bottom:1.25rem}
+.result-icon{font-size:60px;display:block;margin-bottom:.875rem;animation:bounceIn .5s ease-out}
+@keyframes bounceIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.result-hero h1{font-size:24px;font-weight:800;margin-bottom:.4rem}
+.result-pseudo{font-size:14px;color:var(--muted);margin-bottom:1.25rem}
+
+/* ── SCORE RING ── */
+.score-ring{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  width:130px;height:130px;border-radius:50%;border:4px solid;margin-bottom:1.25rem;
+}
+.score-ring.excellent{border-color:var(--green);box-shadow:0 0 40px rgba(16,185,129,.25)}
+.score-ring.good{border-color:var(--yellow);box-shadow:0 0 40px rgba(245,158,11,.25)}
+.score-ring.low{border-color:var(--red);box-shadow:0 0 40px rgba(239,68,68,.25)}
+.score-pct{font-size:32px;font-weight:800;line-height:1}
+.score-frac{font-size:12px;color:var(--muted);margin-top:4px}
+.result-msg{font-size:13px;color:var(--muted);max-width:320px;margin:0 auto 1.25rem;line-height:1.6}
+
+/* ── GRILLES DE STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.875rem;text-align:center}
+.stat-val{font-size:20px;font-weight:800;margin-bottom:2px}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem}
+.detail-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1rem;display:flex;flex-direction:column;gap:4px;
+}
+.detail-box .db-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.detail-box .db-val{font-size:22px;font-weight:800}
+.detail-box .db-sub{font-size:11px;color:var(--muted)}
+.detail-box .db-bar-bg{height:4px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.detail-box .db-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+
+/* ── ACTIONS ── */
+.btn-primary{
+  display:block;width:100%;text-align:center;text-decoration:none;
+  background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+  color:white;border:none;border-radius:11px;padding:13px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(59,130,246,.25);
+  margin-bottom:.625rem;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.35)}
+.btn-secondary{
+  display:block;width:100%;text-align:center;text-decoration:none;
+  background:transparent;border:1.5px solid var(--border);border-radius:11px;padding:11px;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  color:var(--muted);cursor:pointer;transition:all .2s;margin-bottom:.625rem;
+}
+.btn-secondary:hover{border-color:var(--blue);color:var(--text)}
+
+/* ── CLASSEMENT ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.card-head{font-size:15px;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.classement-list{display:flex;flex-direction:column;gap:5px}
+.rank-item{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);border-radius:10px;padding:10px 12px;
+  transition:background .15s;
+}
+.rank-item.me{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)}
+.rank-num{font-size:13px;font-weight:700;color:var(--muted);width:22px;text-align:center;flex-shrink:0}
+.rank-num.gold{color:#F59E0B;font-size:17px}
+.rank-num.silver{color:#94A3B8;font-size:15px}
+.rank-num.bronze{color:#B45309;font-size:14px}
+.rank-pseudo{font-size:13px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-niveau{font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;margin-left:5px;vertical-align:middle}
+.badge-facile{background:rgba(16,185,129,.15);color:#10B981}
+.badge-moyen{background:rgba(245,158,11,.15);color:#F59E0B}
+.badge-difficile{background:rgba(239,68,68,.15);color:#EF4444}
+.rank-right{text-align:right;flex-shrink:0}
+.rank-pct{font-size:14px;font-weight:700}
+.rank-pct.high{color:var(--green)}.rank-pct.mid{color:var(--yellow)}.rank-pct.low{color:var(--red)}
+.rank-detail{font-size:10px;color:var(--muted);margin-top:1px}
+.empty-rank{text-align:center;padding:1.75rem;color:var(--muted);font-size:13px}
+
+/* ── SÉPARATEUR ── */
+.section-divider{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:400px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .result-icon{font-size:48px}
+  .score-ring{width:110px;height:110px}
+  .score-pct{font-size:26px}
+  .card{padding:1rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+{% if show_personal %}
+  <!-- ══ RÉSULTAT PERSONNEL ══ -->
+  {% set pct = ((score / total * 100) | round | int) if total > 0 else 0 %}
+  {% set ring_cls = 'excellent' if pct >= 70 else ('good' if pct >= 40 else 'low') %}
+  {% set pct_color = '#10B981' if pct >= 70 else ('#F59E0B' if pct >= 40 else '#EF4444') %}
+
+  <div class="result-hero">
+    <span class="result-icon">
+      {% if pct >= 80 %}🏆{% elif pct >= 60 %}🎉{% elif pct >= 40 %}💪{% else %}📚{% endif %}
+    </span>
+    <h1>
+      {% if pct >= 80 %}Excellent !{% elif pct >= 60 %}Bien joué !{% elif pct >= 40 %}Continue !{% else %}À retravailler{% endif %}
+    </h1>
+    <div class="result-pseudo">
+      {{pseudo}} · {{niveaux[niveau].emoji}} {{niveaux[niveau].label}}
+      {% if question_max > 0 %} · {{question_num}} questions{% endif %}
+    </div>
+
+    <div class="score-ring {{ring_cls}}">
+      <span class="score-pct" style="color:{{pct_color}}">{{pct}}%</span>
+      <span class="score-frac">{{score}} / {{total}} pts</span>
+    </div>
+
+    <div class="result-msg">
+      {% if pct >= 80 %}Tu maîtrises parfaitement la transcription et la traduction ! 🌟
+      {% elif pct >= 60 %}Bonne maîtrise ! Revois quelques codons pour atteindre le top.
+      {% elif pct >= 40 %}Tu es sur la bonne voie. Utilise la table des codons pour t'entraîner.
+      {% else %}Pas de souci, ça s'apprend ! Relis ton cours et réessaie.{% endif %}
+    </div>
+  </div>
+
+  <!-- STATS GLOBALES -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--blue)">{{question_num}}</div>
+      <div class="stat-label">Questions</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--green)">{{score}}</div>
+      <div class="stat-label">Points</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:{{pct_color}}">{{pct}}%</div>
+      <div class="stat-label">Réussite</div>
+    </div>
+  </div>
+
+  <!-- STATS DÉTAIL ARNm / PROTÉINE -->
+  {% set pct_arn  = ((correct_arn  / question_num * 100)|round|int) if question_num > 0 else 0 %}
+  {% set pct_prot = ((correct_prot / question_num * 100)|round|int) if question_num > 0 else 0 %}
+  <div class="detail-grid">
+    <div class="detail-box">
+      <div class="db-label">ARNm</div>
+      <div class="db-val" style="color:{% if pct_arn >= 70 %}var(--green){% elif pct_arn >= 40 %}var(--yellow){% else %}var(--red){% endif %}">
+        {{correct_arn}}/{{question_num}}
+      </div>
+      <div class="db-sub">{{pct_arn}}% de réussite</div>
+      <div class="db-bar-bg">
+        <div class="db-bar-fill" style="width:{{pct_arn}}%;background:{% if pct_arn >= 70 %}var(--green){% elif pct_arn >= 40 %}var(--yellow){% else %}var(--red){% endif %}"></div>
+      </div>
+    </div>
+    <div class="detail-box">
+      <div class="db-label">Protéine</div>
+      <div class="db-val" style="color:{% if pct_prot >= 70 %}var(--green){% elif pct_prot >= 40 %}var(--yellow){% else %}var(--red){% endif %}">
+        {{correct_prot}}/{{question_num}}
+      </div>
+      <div class="db-sub">{{pct_prot}}% de réussite</div>
+      <div class="db-bar-bg">
+        <div class="db-bar-fill" style="width:{{pct_prot}}%;background:{% if pct_prot >= 70 %}var(--green){% elif pct_prot >= 40 %}var(--yellow){% else %}var(--red){% endif %}"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS REJOUER -->
+  <form method="POST" action="/demarrer">
+    <input type="hidden" name="niveau" value="{{niveau}}">
+    <input type="hidden" name="pseudo" value="{{pseudo}}">
+    <input type="hidden" name="question_max" value="{{question_max}}">
+    <button type="submit" class="btn-primary">🔄 Rejouer (même config)</button>
+  </form>
+  <a href="/" class="btn-secondary">🏠 Changer de niveau / pseudo</a>
+
+  <hr class="section-divider">
+{% else %}
+  <!-- Visite directe sans partie jouée -->
+  <div style="text-align:center;padding:2rem 0 1.5rem">
+    <span style="font-size:48px;display:block;margin-bottom:1rem">🏆</span>
+    <h1 style="font-size:22px;font-weight:800;margin-bottom:.5rem">Classement général</h1>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem">Joue une partie pour y apparaître !</p>
+    <a href="/" class="btn-primary" style="max-width:280px;margin:0 auto">🚀 Commencer un quiz</a>
+  </div>
+  <hr class="section-divider">
+{% endif %}
+
+  <!-- ══ CLASSEMENT ══ -->
+  <div class="card">
+    <div class="card-head">🏆 Classement général <span style="font-size:12px;font-weight:400;color:var(--muted)">(Top 20)</span></div>
+    {% if classement %}
+    <div class="classement-list">
+      {% for entry in classement %}
+      <div class="rank-item {% if show_personal and entry.pseudo == pseudo %}me{% endif %}">
+        <span class="rank-num {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% elif loop.index == 3 %}bronze{% endif %}">
+          {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{loop.index}}{% endif %}
+        </span>
+        <span class="rank-pseudo">
+          {{entry.pseudo}}
+          <span class="rank-niveau badge-{{entry.niveau}}">{{entry.niveau}}</span>
+        </span>
+        <div class="rank-right">
+          <div class="rank-pct {% if entry.pct >= 70 %}high{% elif entry.pct >= 40 %}mid{% else %}low{% endif %}">
+            {{entry.pct}}%
+          </div>
+          <div class="rank-detail">{{entry.score}}/{{entry.total}} · {{entry.nb_questions}}Q · {{entry.date}}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-rank">Aucune entrée encore. Sois le premier ! 🚀</div>
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>
